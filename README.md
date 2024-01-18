@@ -2,7 +2,7 @@
 
 An application designed to create osu! levels (or Beatmaps) upon inputting:
 - A song mp4 file
-- A desired difficulty from 1-7
+- Difficulty Settings (ar, od, star rating....)
 
 Usage of Deep Learning and TensorFlow/PyTorch.
 
@@ -10,3 +10,7 @@ Usage of Deep Learning and TensorFlow/PyTorch.
 
 Dataset provided by alumkal:
 https://www.kaggle.com/datasets/alumkal/osu-beatmaps
+
+## Link to schedule
+
+https://docs.google.com/document/d/1RMmFeg1ca6JZGwH0XjBUNiD0ouBOtOtqDEzwKFrM6Sw/edit?usp=sharing
