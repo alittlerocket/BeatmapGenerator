@@ -65,8 +65,10 @@ class General(Section):
             return int(value)
         elif key in ['StackLeniency']:
             return float(value)
-        else:
+        elif key in ['AudioFilename', 'AudioHash', 'SampleSet', 'OverlayPosition', 'SkinPreference']:
             return value
+        else:
+            raise Exception("General: Key not found")
 
 class Editor(Section):
     def __init__(self):
@@ -84,7 +86,7 @@ class Editor(Section):
         elif key in ['BeatDivisor', 'GridSize']:
             return int(value)
         else:
-            return value
+            raise Exception("Editor: Key not found")
 
 class Metadata(Section):
     def __init__(self):
@@ -104,8 +106,11 @@ class Metadata(Section):
             return int(value)
         elif key == 'Tags':
             return value.split()  # Splitting by spaces
-        else:
+        elif key in ['Title', 'TitleUnicode', 'Artist',
+                     'ArtistUnicode', 'Creator', 'Version', 'Source']:
             return value
+        else:
+            raise Exception("Metadata: Key not found")
 
 class Difficulty(Section):
     def __init__(self):
@@ -115,6 +120,13 @@ class Difficulty(Section):
         self.ApproachRate = 5.0  
         self.SliderMultiplier = 1.0  
         self.SliderTickRate = 1.0  
+    
+    def _cast_value(self, key: str, value: str):
+        if key in ['HPDrainRate', 'CircleSize', 'OverallDifficulty',
+                   'ApproachRate', 'SliderMultiplier', 'SliderTickRate']:
+            return float(value)
+        else:
+            raise Exception("Difficulty: Key not found")
 
 class Events(Section):
     def __init__(self):
@@ -176,6 +188,8 @@ class Colours(Section):
                         self.slider_track_override = value
                     elif key == 'SliderBorder':
                         self.slider_border = value
+                    else:
+                        raise Exception("Colours: Key not found")
 
     def to_dict(self) -> dict:
         return {
@@ -205,12 +219,11 @@ class TimingPoints:
                         bool(int(parts[6])),  # uninherited
                         int(parts[7])     # effects
                     ])
+                else:
+                    raise Exception(f"TimingPoints: Incorrect number of arguments (Need 8, got {len(parts)})")
 
     def to_numpy(self) -> np.ndarray:
         return np.array(self.timing_points)
-
-    def to_list(self) -> list:
-        return self.timing_points
 
 class HitObjects:
     def __init__(self):
@@ -285,7 +298,7 @@ class Spinner(HitObject):
         super().__init__(x, y, time, type_flags, hit_sound, hit_sample)
         self.end_time = int(object_params[0])
 
-### BEATMAP OBJECT
+### BEATMAP OBJECT ###
 class Beatmap:
     def __init__(self, 
                  general: General,
@@ -308,29 +321,33 @@ class Beatmap:
 
 ### Wrapper function ###
 def create_beatmap_from_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
-
-    sections = {"[General]": "", "[Editor]": "", "[Metadata]": "", "[Difficulty]": "",
-                "[Events]": "", "[TimingPoints]": "", "[Colours]": "", "[HitObjects]": ""}
+    section_classes = {
+        "[General]": General,
+        "[Editor]": Editor,
+        "[Metadata]": Metadata,
+        "[Difficulty]": Difficulty,
+        "[Events]": Events,
+        "[TimingPoints]": TimingPoints,
+        "[Colours]": Colours,
+        "[HitObjects]": HitObjects
+    }
+    
+    # Initialize sections
+    sections = {section: "" for section in section_classes}
     current_section = None
 
-    for line in lines:
-        line = line.strip()
-        if line in sections:
-            current_section = line
-            continue
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            line = line.strip()
+            if line in section_classes:
+                current_section = line
+            elif current_section and line:
+                sections[current_section] += line + '\n'
 
-        if current_section and line:
-            sections[current_section] += line + '\n'
+    # Create section objects
+    section_objects = {name: cls() for name, cls in section_classes.items()}
+    for name, data in sections.items():
+        section_objects[name].load_from_string(data)
 
-    general = General(sections["[General]"])
-    editor = Editor(sections["[Editor]"])
-    metadata = Metadata(sections["[Metadata]"])
-    difficulty = Difficulty(sections["[Difficulty]"])
-    events = Events(sections["[Events]"])
-    timing_points = TimingPoints(sections["[TimingPoints]"])
-    colours = Colours(sections["[Colours]"])
-    hit_objects = HitObjects(sections["[HitObjects]"])
-
-    return Beatmap(general, editor, metadata, difficulty, events, timing_points, colours, hit_objects)
+    # Create and return the Beatmap object
+    return Beatmap(*section_objects.values())
