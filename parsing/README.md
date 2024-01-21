@@ -67,7 +67,7 @@ Only exception to this rule is TimingPoints, as it is formatted into a list for 
 
 You can extend the functionality of the parser by modifying the existing classes or adding new functionality to handle more specific aspects of .osu files.
 
-## Licence
+## License
 
 TBA
 
