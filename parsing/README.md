@@ -39,11 +39,11 @@ Each class is responsible for parsing and storing data from its respective secti
 ## Usage
 
 1. Ensure `.osu` file is correctly formatted and accessible. It's ok if deprecated items exist in your file.
-1. Use the `create_beatmap_from_file` function to parse the file.
+2. Use the `create_beatmap_from_file` function to parse the file.
 ```Python
 beatmap = create_beatmap_from_file("path/to/your/osu_file.osu")
 ```
-1. Access parsed data via `Beatmap`:
+3. Access parsed data via `Beatmap`:
 
 ```Python
 print(beatmap.general.AudioFilename)
