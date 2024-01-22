@@ -70,7 +70,7 @@ class General(Section):
         else:
             raise Exception("General: Key not found")
 
-class Editor:
+class Editor(Section):
     def __init__(self):
         self.Bookmarks: List[int] = []  # List of integers
         self.DistanceSpacing: float = 1.0  # Decimal
