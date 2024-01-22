@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Union
+from typing import List, Dict, Tuple, Union, Optional
 
 ### SECTIONS ###
 class Section:
@@ -31,25 +31,25 @@ class Section:
 
 class General(Section):
     def __init__(self):
-        self.AudioFilename = None
-        self.AudioLeadIn = 0
-        self.AudioHash = None  # Deprecated
-        self.PreviewTime = -1
-        self.Countdown = 1
-        self.SampleSet = "Normal"
-        self.StackLeniency = 0.7
-        self.Mode = 0
-        self.LetterboxInBreaks = 0
-        self.StoryFireInFront = 1  # Deprecated
-        self.UseSkinSprites = 0
-        self.AlwaysShowPlayfield = 0  # Deprecated
-        self.OverlayPosition = "NoChange"
-        self.SkinPreference = None
-        self.EpilepsyWarning = 0
-        self.CountdownOffset = 0
-        self.SpecialStyle = 0
-        self.WidescreenStoryboard = 0
-        self.SamplesMatchPlaybackRate = 0
+        self.AudioFilename: Optional[str] = None
+        self.AudioLeadIn: int = 0
+        self.AudioHash: Optional[str] = None  # Deprecated
+        self.PreviewTime: int = -1
+        self.Countdown: int = 1
+        self.SampleSet: str = "Normal"
+        self.StackLeniency: float = 0.7
+        self.Mode: int = 0
+        self.LetterboxInBreaks: int = 0
+        self.StoryFireInFront: int = 1  # Deprecated
+        self.UseSkinSprites: int = 0
+        self.AlwaysShowPlayfield: int = 0  # Deprecated
+        self.OverlayPosition: str = "NoChange"
+        self.SkinPreference: Optional[str] = None
+        self.EpilepsyWarning: int = 0
+        self.CountdownOffset: int = 0
+        self.SpecialStyle: int = 0
+        self.WidescreenStoryboard: int = 0
+        self.SamplesMatchPlaybackRate: int = 0
     
     def _cast_value(self, 
                     key, 
@@ -70,13 +70,14 @@ class General(Section):
         else:
             raise Exception("General: Key not found")
 
-class Editor(Section):
+class Editor:
     def __init__(self):
-        self.Bookmarks = []  # List of integers
-        self.DistanceSpacing = 1.0  # Decimal
-        self.BeatDivisor = 4  # Integer
-        self.GridSize = 4  # Integer
-        self.TimelineZoom = 1.0  # Decimal
+        self.Bookmarks: List[int] = []  # List of integers
+        self.DistanceSpacing: float = 1.0  # Decimal
+        self.BeatDivisor: int = 4  # Integer
+        self.GridSize: int = 4  # Integer
+        self.TimelineZoom: float = 1.0  # Decimal
+
 
     def _cast_value(self, key: str, value: str) -> Union[List[int], float, int]:
         if key == 'Bookmarks':
@@ -90,16 +91,16 @@ class Editor(Section):
 
 class Metadata(Section):
     def __init__(self):
-        self.Title = ""
-        self.TitleUnicode = ""
-        self.Artist = ""
-        self.ArtistUnicode = ""
-        self.Creator = ""
-        self.Version = ""
-        self.Source = ""
-        self.Tags = []  # List of strings
-        self.BeatmapID = 0
-        self.BeatmapSetID = 0
+        self.Title: str = ""
+        self.TitleUnicode: str = ""
+        self.Artist: str = ""
+        self.ArtistUnicode: str = ""
+        self.Creator: str = ""
+        self.Version: str = ""
+        self.Source: str = ""
+        self.Tags: List[str] = []
+        self.BeatmapID: int = 0
+        self.BeatmapSetID: int = 0
 
     def _cast_value(self, key: str, value: str):
         if key in ['BeatmapID', 'BeatmapSetID']:
@@ -114,12 +115,12 @@ class Metadata(Section):
 
 class Difficulty(Section):
     def __init__(self):
-        self.HPDrainRate = 5.0  
-        self.CircleSize = 5.0  
-        self.OverallDifficulty = 5.0  
-        self.ApproachRate = 5.0  
-        self.SliderMultiplier = 1.0  
-        self.SliderTickRate = 1.0  
+        self.HPDrainRate: float = 5.0  
+        self.CircleSize: float = 5.0  
+        self.OverallDifficulty: float = 5.0  
+        self.ApproachRate: float = 5.0  
+        self.SliderMultiplier: float = 1.0  
+        self.SliderTickRate: float = 1.0  
     
     def _cast_value(self, key: str, value: str):
         if key in ['HPDrainRate', 'CircleSize', 'OverallDifficulty',
@@ -130,7 +131,7 @@ class Difficulty(Section):
 
 class Events(Section):
     def __init__(self):
-        self.events = []
+        self.events: List[Dict] = []
 
     def load_from_string(self, data_string: str):
         for line in data_string.strip().split('\n'):
@@ -169,9 +170,9 @@ class Events(Section):
 
 class Colours(Section):
     def __init__(self):
-        self.combo_colors = {}  # Stores combo colors in a dictionary
-        self.slider_track_override = None
-        self.slider_border = None
+        self.combo_colors: Dict = {}
+        self.slider_track_override: Optional[Tuple] = None
+        self.slider_border: Optional[Tuple] = None
 
     def load_from_string(self, data_string: str):
         for line in data_string.strip().split('\n'):
@@ -201,7 +202,7 @@ class Colours(Section):
 ### DATA ###
 class TimingPoints:
     def __init__(self):
-        self.timing_points = []
+        self.timing_points: List[List[Union[int, float]]] = []
 
     def load_from_string(self, data_string: str):
         for line in data_string.strip().split('\n'):
@@ -227,7 +228,7 @@ class TimingPoints:
 
 class HitObjects:
     def __init__(self):
-        self.hit_objects = []
+        self.hit_objects: List[HitObject] = []
 
     def load_from_string(self, data_string: str):
         for line in data_string.strip().split('\n'):
@@ -238,14 +239,14 @@ class HitObjects:
 
 class HitObject:
     def __init__(self, x, y, time, type_flags, hit_sound, hit_sample):
-        self.x = int(x)
-        self.y = int(y)
-        self.time = int(time)
-        self.type_flags = int(type_flags)
-        self.hit_sound = int(hit_sound)
-        self.hit_sample = hit_sample.split(':')
-        self.new_combo = self.type_flags & 4 > 0
-        self.combo_skip = (self.type_flags >> 4) & 7
+        self.x: int = x
+        self.y: int = y
+        self.time: int = time
+        self.type_flags: int = type_flags
+        self.hit_sound: int = hit_sound
+        self.hit_sample: List[str] = hit_sample.split(':')
+        self.new_combo: bool = self.type_flags & 4 > 0
+        self.combo_skip: int = (self.type_flags >> 4) & 7
 
     @staticmethod
     def create(line):
@@ -267,27 +268,15 @@ class Circle(HitObject):
         super().__init__(x, y, time, type_flags, hit_sound, hit_sample)
 
 class Slider(HitObject):
-    def __init__(self, x, y, time, type_flags, hit_sound, object_params, hit_sample):
-        super().__init__(x, y, time, type_flags, hit_sound, hit_sample)
-
-        # Basic Slider Params
-        curve = object_params[0].split('|')
-        self.curveType = curve[0]
-        self.curvePoints = [self._parse_point(point) for point in curve[1:]]
-        self.slides = object_params[1]
-        self.length = object_params[2]
-        
-        # Edgesounds
-        if len(object_params) > 3:
-            self.edgeSounds = [int(sound) for sound in object_params[3].split('|')]
-        else:
-            self.edgeSounds = []
-
-        # Edgesets
-        if len(object_params) > 4:
-            self.edgeSets = object_params[4].split('|')
-        else:
-            self.edgeSets = []
+    def __init__(self, x: int, y: int, time: int, type_flags: int, hit_sound: int, object_params: List[str], hit_sample: str):
+            super().__init__(x, y, time, type_flags, hit_sound, hit_sample)
+            curve = object_params[0].split('|')
+            self.curveType: str = curve[0]
+            self.curvePoints: List[Tuple[int, int]] = [self._parse_point(point) for point in curve[1:]]
+            self.slides: int = int(object_params[1])
+            self.length: float = float(object_params[2])
+            self.edgeSounds: List[int] = [int(sound) for sound in object_params[3].split('|')] if len(object_params) > 3 else []
+            self.edgeSets: List[str] = object_params[4].split('|') if len(object_params) > 4 else []
     
     def _parse_point(self, point_str):
         x, y = point_str.split(':')
@@ -296,7 +285,7 @@ class Slider(HitObject):
 class Spinner(HitObject):
     def __init__(self, x, y, time, type_flags, hit_sound, object_params, hit_sample):
         super().__init__(x, y, time, type_flags, hit_sound, hit_sample)
-        self.end_time = int(object_params[0])
+        self.end_time: int = int(object_params[0])
 
 ### BEATMAP OBJECT ###
 class Beatmap:
@@ -310,14 +299,14 @@ class Beatmap:
                  colours: Colours,
                  hitObjects: HitObjects):
         
-        self.general = general
-        self.editor = editor
-        self.metadata = metadata
-        self.difficulty = difficulty
-        self.events = events
-        self.timingPoints = timingPoints
-        self.colours = colours
-        self.hitObjects = hitObjects
+        self.general: General = general
+        self.editor: Editor = editor
+        self.metadata: Metadata = metadata
+        self.difficulty: Difficulty = difficulty
+        self.events: Events = events
+        self.timingPoints: TimingPoints = timingPoints
+        self.colours: Colours = colours
+        self.hitObjects: HitObjects = hitObjects
 
 ### Wrapper function ###
 def create_beatmap_from_file(file_path):
