@@ -251,14 +251,13 @@ class HitObject:
     @staticmethod
     def create(line):
         parts = line.split(',')
-        x, y, time, type_flags, hit_sound, *object_params, hit_sample = parts
-        hit_object_type = int(type_flags)
-
-        if hit_object_type & 1:
+        x, y, time, type_flags, hit_sound, *object_params, hit_sample = [int(part) if i < 5 else part for i, part in enumerate(parts)]
+        
+        if type_flags & 1:
             return Circle(x, y, time, type_flags, hit_sound, hit_sample)
-        elif hit_object_type & 2:
+        elif type_flags & 2:
             return Slider(x, y, time, type_flags, hit_sound, object_params, hit_sample)
-        elif hit_object_type & 8:
+        elif type_flags & 8:
             return Spinner(x, y, time, type_flags, hit_sound, object_params, hit_sample)
         else:
             return HitObject(x, y, time, type_flags, hit_sound, hit_sample)
