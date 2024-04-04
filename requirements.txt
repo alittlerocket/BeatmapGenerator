@@ -1,1 +1,3 @@
 pip install numpy, torch
+conda install -c conda-forge ffmpeg libsndfile
+pip install spleeter
