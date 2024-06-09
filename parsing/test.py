@@ -1,4 +1,4 @@
-from parse_beatmap import *
+from parsing.parse import *
 import unittest
 
 class BeatmapTest(unittest.TestCase):
