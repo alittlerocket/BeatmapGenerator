@@ -153,23 +153,6 @@ def audio_processing(path_to_mp4, instrument_dir, stems=4):
     
     return prioritized_onsets
 
-def create_beatmap(prioritized_onsets, output_file='new_beatmap.osu'):
-    """
-    Create an osu! beatmap file using the prioritized onset times.
-
-    Parameters:
-    - prioritized_onsets: list - List of prioritized onset times.
-    - output_file: str - The path to the output beatmap file (default is 'new_beatmap.osu').
-    """
-    with open(output_file, 'w') as f:
-        # Write the osu! beatmap file header and metadata
-        f.write("[TimingPoints]\n")
-        for time in prioritized_onsets:
-            f.write(f"{time*1000},500,4,2,1,60,1,0\n")
-
-        f.write("\n[HitObjects]\n")
-        for time in prioritized_onsets:
-            f.write(f"256,192,{int(time*1000)},1,0,0:0:0:0:\n")
 
 # # Example usage
 # path_to_mp4 = 'path/to/song.mp3'
